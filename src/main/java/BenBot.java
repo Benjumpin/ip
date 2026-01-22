@@ -7,23 +7,41 @@ public class BenBot {
                                 "What can i do for you?\n\n");
 
         Scanner sc = new Scanner(System.in);
-        List<String> ls = new ArrayList<>(100);
+        List<Task> ls = new ArrayList<>(100);
 
         while (true) {
-            String input = sc.nextLine();
-            if (input.trim().equalsIgnoreCase("bye")) break;
-            else if(input.trim().equalsIgnoreCase("list")) {
+            String inputString = sc.nextLine();
+            String niceInputString = inputString.trim().toLowerCase();
+            if (niceInputString.equals("bye")) break;
+
+            else if(niceInputString.equals("list")) {
                 // print list
-                StringBuilder inputls = new StringBuilder();
-                int i = 1;
-                for (String s : ls) {
-                    inputls.append(i + ". " + ls.get(i-1) + "\n");
-                    i++;
+                StringBuilder inputList = new StringBuilder();
+
+                for (int i = 0; i< ls.size(); i++) {
+                    inputList.append(i + 1 + ". " + ls.get(i) + "\n");
                 }
-                reply(inputls.toString());
-            } else { // add input to list
-                ls.add(input);
-                reply("added: " + input);
+                reply(inputList.toString());
+
+            } else if (niceInputString.startsWith("mark")) {
+                // mark item
+                String[] num = niceInputString.split(" ");
+                Task itemToMark = ls.get(Integer.parseInt(num[1]) - 1);
+                itemToMark.markDone();
+                reply("Nice! I've marked this task as done:\n " + itemToMark);
+
+            } else if (niceInputString.startsWith("unmark")) {
+                // mark item
+                String[] num = niceInputString.split(" ");
+                Task itemToMark = ls.get(Integer.parseInt(num[1]) - 1);
+                itemToMark.markUndone();
+                reply("Nice! I've unmarked this task as done:\n " + itemToMark);
+
+            } else {
+                // add input to list
+                Task inputTask = new Task(inputString);
+                ls.add(inputTask);
+                reply("added: " + inputString);
             }
 
         }
