@@ -1,14 +1,38 @@
-import java.util.*;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.List;
+import java.io.IOException;
 
 public class BenBot {
+
+    private static final String FILE_PATH = "./data/benbot.txt";
+    private static Storage storage;
+
     public static void main(String[] args) {
+
+        storage = new Storage(FILE_PATH);
+
+        try {
+            storage.createDataFileIfNeeded();
+        } catch (IOException error) {
+            System.out.println("Error initializing storage: " + error.getMessage());
+            return;
+        }
+
         System.out.println("=================================\n" +
                             "Hello! I'm BenBot!\n" +
                                 "What can i do for you?\n" +
                                   "=================================");
 
         Scanner sc = new Scanner(System.in);
-        List<Task> ls = new ArrayList<>();
+        List<Task> ls;
+
+        try {
+            ls = storage.loadFile();
+        } catch (BenBotExceptions error) {
+            System.out.println("Warning: " + error.getMessage());
+            ls = new ArrayList<>();
+        }
 
         while (true) {
             String inputString = sc.nextLine();
@@ -37,6 +61,7 @@ public class BenBot {
                         String[] strings = niceInputString.split(" ");
                         Task itemToMark = ls.get(Integer.parseInt(strings[1]) - 1);
                         itemToMark.markDone();
+                        saveTask(ls);
                         reply("Nice! I've marked this task as done:\n " + itemToMark);
                         break;
 
@@ -45,18 +70,19 @@ public class BenBot {
                         String[] strings2 = niceInputString.split(" ");
                         Task itemToMark2 = ls.get(Integer.parseInt(strings2[1]) - 1);
                         itemToMark2.markUndone();
+                        saveTask(ls);
                         reply("OK, I've marked this task as not done yet:\n " + itemToMark2);
                         break;
 
                     case TODO:
                         // todo item
                         if (niceInputString.length() <= 5) {
-                            // STOP here and throw the error. The catch block above will handle it.
                             throw new BenBotExceptions("Empty description");
                         }
                         String todoItem = inputString.substring(5).trim();
                         Task t = new Todo(todoItem);
                         ls.add(t);
+                        saveTask(ls);
                         reply("Got it. I've added this task:\n  " + t +
                                 "\nNow you have " + ls.size() + " tasks in the list.");
                         break;
@@ -74,6 +100,7 @@ public class BenBot {
                             String by = deadlineItem[1].trim();
                             Task td = new Deadline(desc, by);
                             ls.add(td);
+                            saveTask(ls);
                             reply("Got it. I've added this task:\n  " + td +
                                     "\nNow you have " + ls.size() + " tasks in the list.");
                         }
@@ -93,6 +120,7 @@ public class BenBot {
                             String to = eventItem[2].trim();
                             Task te = new Event(desc, from, to);
                             ls.add(te);
+                            saveTask(ls);
                             reply("Got it. I've added this task:\n  " + te +
                                     "\nNow you have " + ls.size() + " tasks in the list.");
                         }
@@ -110,7 +138,8 @@ public class BenBot {
                             if (index < 0 || index >= ls.size()) {
                                 throw new BenBotExceptions("No such item in list");
                             }
-                            Task tdel = ls.remove(index); // save removed item to print latre
+                            Task tdel = ls.remove(index); // save removed item to print later
+                            saveTask(ls);
                             reply("Noted. I've removed this task:\n  " + tdel +
                                     "\nNow you have " + ls.size() + " tasks in the list.");
                         } catch (NumberFormatException e) {
@@ -137,12 +166,24 @@ public class BenBot {
         System.out.println(message);
         System.out.println("=================================\n");
     }
-    // Helper method to parse the command
+
+    // Parsing command
     private static Command getCommand(String commandWord) {
         try {
             return Command.valueOf(commandWord.toUpperCase());
         } catch (IllegalArgumentException e) {
             return Command.UNKNOWN;
+        }
+    }
+
+    /*
+    Saving the current list of tasks into the storage txt file
+     */
+    private static void saveTask(List<Task> tasks) {
+        try {
+            storage.saveFile(tasks);
+        } catch (IOException error) {
+            System.out.println(":C Error saving tasks to file: " + error.getMessage());
         }
     }
 
