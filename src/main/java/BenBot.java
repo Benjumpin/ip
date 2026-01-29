@@ -182,6 +182,29 @@ public class BenBot {
                             throw new BenBotExceptions("Please enter a number");
                         }
                         break;
+                    case FIND:
+                        if (niceInputString.length() <= 5) {
+                            throw new BenBotExceptions("Enter task to search using find ___");
+                        }
+
+                        String keyword = niceInputString.substring(5).trim();
+                        StringBuilder foundTasks = new StringBuilder("Here are the matching tasks:\n");
+                        int matchCount = 0;
+
+                        for (int i = 0; i < ls.size(); i++) {
+                            Task task = ls.get(i);
+                            if (task.toString().contains(keyword)) {
+                                matchCount++;
+                                foundTasks.append(matchCount + "." + task + "\n");
+                            }
+                        }
+
+                        if (matchCount == 0) {
+                            reply("No task found");
+                        } else {
+                            reply(foundTasks.toString());
+                        }
+                        break;
                     default:
                         throw new BenBotExceptions("stop blabbering!");
                 }

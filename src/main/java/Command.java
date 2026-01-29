@@ -7,5 +7,6 @@ public enum Command {
     EVENT,
     DELETE,
     BYE,
-    UNKNOWN // A fallback for invalid inputs
+    FIND,
+    UNKNOWN
 }
