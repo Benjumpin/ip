@@ -8,6 +8,11 @@ public class Deadline extends Task {
     }
 
     @Override
+    public String changeFileFormat() {
+        return "D | " + (isComplete ? "1" : "0") + " | " + item + " | " + this.by;
+    }
+
+    @Override
     public String toString() {
         return "[D]" + super.toString() + " (by: " + by + ")";
     }

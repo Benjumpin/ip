@@ -10,6 +10,11 @@ public class Event extends Task {
     }
 
     @Override
+    public String changeFileFormat() {
+        return "E | " + (isComplete ? "1" : "0") + " | " + item + " | " + this.from + " | " + this.to;
+    }
+
+    @Override
     public String toString() {
         return "[E]" + super.toString() + " (from: " + from + " to: " + to + ")";
     }

@@ -1,0 +1,7 @@
+T | 1 | eat
+E | 0 | sleep | tonight | tmr
+D | 0 | shit | tmr
+T | 0 | eat
+E | 0 | sleep | tonight | tmr
+D | 0 | shit | tonight
+T | 1 | go home
