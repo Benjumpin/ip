@@ -1,3 +1,5 @@
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.List;
@@ -98,11 +100,26 @@ public class BenBot {
                         } else {
                             String desc = deadlineItem[0].substring(9).trim();
                             String by = deadlineItem[1].trim();
-                            Task td = new Deadline(desc, by);
-                            ls.add(td);
-                            saveTask(ls);
-                            reply("Got it. I've added this task:\n  " + td +
-                                    "\nNow you have " + ls.size() + " tasks in the list.");
+
+                            try {
+                                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+                                LocalDateTime datetime = LocalDateTime.parse(by, formatter);
+
+                                if (datetime.isBefore(LocalDateTime.now())) {
+                                    throw new BenBotExceptions("You cannot set a deadline in the past!");
+                                }
+
+                                Task td = new Deadline(desc, by);
+                                ls.add(td);
+                                saveTask(ls);
+                                reply("Got it. I've added this task:\n  " + td +
+                                        "\nNow you have " + ls.size() + " tasks in the list.");
+
+                            } catch (java.time.format.DateTimeParseException error) {
+                                reply("Invalid Format! Please use: yyyy-MM-dd HH:mm (Eg. 2026-01-29 18:00)");
+                            } catch (BenBotExceptions error) {
+                                reply(error.getMessage());
+                            }
                         }
                         break;
 
@@ -118,11 +135,30 @@ public class BenBot {
                             String desc = eventItem[0].substring(6).trim();
                             String from = eventItem[1].trim();
                             String to = eventItem[2].trim();
-                            Task te = new Event(desc, from, to);
-                            ls.add(te);
-                            saveTask(ls);
-                            reply("Got it. I've added this task:\n  " + te +
-                                    "\nNow you have " + ls.size() + " tasks in the list.");
+
+                            try  {
+                                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+                                LocalDateTime fromDate = LocalDateTime.parse(from, formatter);
+                                LocalDateTime toDate = LocalDateTime.parse(to, formatter);
+
+                                if (fromDate.isBefore(LocalDateTime.now())) {
+                                    throw new BenBotExceptions("You cannot set a date in the past!");
+                                }
+
+                                if (toDate.isBefore(fromDate)) {
+                                    throw new BenBotExceptions("Can't set end date before start date!");
+                                }
+
+                                Task te = new Event(desc, from, to);
+                                ls.add(te);
+                                saveTask(ls);
+                                reply("Got it. I've added this task:\n  " + te +
+                                        "\nNow you have " + ls.size() + " tasks in the list.");
+                            } catch (java.time.format.DateTimeParseException error) {
+                                reply("Invalid Format! Please use: yyyy-MM-dd HH:mm (Eg. 2026-01-29 18:00)");
+                            } catch (BenBotExceptions error) {
+                                reply(error.getMessage());
+                            }
                         }
                         break;
 
