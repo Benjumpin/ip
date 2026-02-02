@@ -1,3 +1,5 @@
+package benbot.command;
+
 public enum Command {
     LIST,
     MARK,

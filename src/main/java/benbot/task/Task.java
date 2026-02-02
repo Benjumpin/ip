@@ -1,3 +1,5 @@
+package benbot.task;
+
 public class Task {
     protected boolean isComplete;
     protected String item;

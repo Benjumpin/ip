@@ -1,8 +1,15 @@
+package benbot.storage;
+
+import benbot.exception.BenBotExceptions;
+import benbot.task.Deadline;
+import benbot.task.Event;
+import benbot.task.Task;
+import benbot.task.Todo;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.FileWriter;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -46,7 +53,7 @@ public class Storage {
        fw.close();
    }
 
-   public List<Task> loadFile() throws  BenBotExceptions {
+   public List<Task> loadFile() throws BenBotExceptions {
        List<Task> loadedFiles = new ArrayList<>();
        File file = new File(filePath);
 

@@ -1,3 +1,13 @@
+package benbot;
+
+import benbot.task.Task;
+import benbot.task.Todo;
+import benbot.task.Deadline;
+import benbot.task.Event;
+import benbot.storage.Storage;
+import benbot.exception.BenBotExceptions;
+import benbot.command.Command;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
@@ -22,7 +32,7 @@ public class BenBot {
         }
 
         System.out.println("=================================\n" +
-                            "Hello! I'm BenBot!\n" +
+                            "Hello! I'm benbot.BenBot!\n" +
                                 "What can i do for you?\n" +
                                   "=================================");
 
