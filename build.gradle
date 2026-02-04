@@ -1,0 +1,33 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'checkstyle'
+}
+
+repositories {
+    mavenCentral()
+}
+
+run {
+    standardInput = System.in
+}
+
+dependencies {
+    // JUnit 5 for testing (standard for this course)
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.10.0'
+    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.10.0'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+application {
+    // This is the most important line!
+    // It tells Gradle where your "public static void main" is located.
+    mainClass = 'benbot.BenBot'
+}
+
+checkstyle {
+    toolVersion = '10.2'
+}
