@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'application'
     id 'checkstyle'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
 repositories {
@@ -33,10 +34,13 @@ test {
 }
 
 application {
-    // We are changing this to the new Launcher class!
-    mainClass = 'benbot.Launcher'
+    mainClass.set("benbot.Launcher")
 }
 
 checkstyle {
     toolVersion = '10.2'
+}
+
+shadowJar {
+    archiveFileName = 'benbot.jar'
 }
