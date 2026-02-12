@@ -5,6 +5,7 @@ public class Task {
     protected String item;
 
     public Task(String item) {
+        assert item != null && !item.isBlank(): " Task description cannot be empty";
         this.item = item;
         this.isComplete = false;
     }

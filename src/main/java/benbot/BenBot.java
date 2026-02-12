@@ -38,11 +38,13 @@ public class BenBot {
      * Generates a response for the user's chat message.
      */
     public String getResponse(String input) {
+        assert input != null: "Input string to getResponse cannot be null";
         String niceInputString = input.trim();
         String[] inputStringArray = niceInputString.split(" ", 2);
+        assert inputStringArray.length > 0: "input parsing failed to produce any tokens";
         String command = inputStringArray[0];
         Command com = getCommand(command);
-
+        assert com != null: "getCommand should return a Command enum";
         try {
             switch (com) {
                 case BYE:
@@ -195,6 +197,7 @@ public class BenBot {
         }
     }
     private void saveTask(List<Task> tasks) {
+        assert tasks != null: "Attempted to save a null task list to storage";
         try {
             storage.saveFile(tasks);
         } catch (IOException error) {
