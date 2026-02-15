@@ -35,6 +35,7 @@ test {
 
 application {
     mainClass.set("benbot.Launcher")
+
 }
 
 checkstyle {
