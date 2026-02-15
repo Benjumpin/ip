@@ -15,16 +15,27 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- Handling the loading and saving of tasks to the hard disk
+ * Handles the loading and saving of tasks to the hard disk.
+ * This class manages file and directory creation, reading from the data file,
+ * and writing task data back to storage.
  */
-
 public class Storage {
    private final String filePath;
 
+   /**
+     * Constructs a Storage object with a specified file path.
+     *
+     * @param filePath The relative or absolute path to the data file.
+     */
    public Storage(String filePath) {
        this.filePath = filePath;
    }
 
+    /**
+     * Creates the data file and any necessary parent directories if they do not exist.
+     *
+     * @throws IOException If the directory or file cannot be created.
+     */
    public void createDataFileIfNeeded() throws IOException {
        File newFile = new File(filePath);
        File parentDir = newFile.getParentFile();
@@ -44,6 +55,12 @@ public class Storage {
        }
    }
 
+    /**
+     * Saves the current list of tasks to the hard disk.
+     *
+     * @param tasks The list of tasks to be written to the file.
+     * @throws IOException If an error occurs during the writing process.
+     */
    public void saveFile(List<Task> tasks) throws IOException {
        FileWriter fw = new FileWriter(filePath);
 
@@ -53,6 +70,12 @@ public class Storage {
        fw.close();
    }
 
+    /**
+     * Loads the tasks from the data file on the hard disk.
+     *
+     * @return A list of tasks parsed from the file.
+     * @throws BenBotExceptions If the file is not found or contains corrupted data.
+     */
    public List<Task> loadFile() throws BenBotExceptions {
        List<Task> loadedFiles = new ArrayList<>();
        File file = new File(filePath);
@@ -72,6 +95,13 @@ public class Storage {
        return loadedFiles;
    }
 
+    /**
+     * Parses a single line from the data file into a Task object.
+     *
+     * @param line The raw string line from the data file.
+     * @return The corresponding Task object (Todo, Deadline, or Event).
+     * @throws BenBotExceptions If the line format is unrecognized or corrupted.
+     */
    private Task fromLineToTask(String line) throws BenBotExceptions {
        String[] parts = line.split(" \\| ");
        if (parts.length < 3 || parts.length > 5) {

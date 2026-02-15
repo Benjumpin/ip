@@ -11,6 +11,11 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.io.IOException;
 
+
+/**
+ * The main logic for the BenBot chatbot.
+ */
+
 public class BenBot {
 
     private static final String FILE_PATH = "./data/benbot.txt";
@@ -34,17 +39,15 @@ public class BenBot {
     }
 
     /**
-     * Generates a response for the user's chat message.
+     * Generates a response based on user input.
+     *
+     * @param input The raw string input from the user.
+     * @return The formatted response string from BenBot.
      */
     public String getResponse(String input) {
         assert input != null: "Input string to getResponse cannot be null";
         Command com = Parser.parseCommand(input);
         String arguments = Parser.parseArguments(input);
-//        String niceInputString = input.trim();
-//        String[] inputStringArray = niceInputString.split(" ", 2);
-//        assert inputStringArray.length > 0: "input parsing failed to produce any tokens";
-//        String command = inputStringArray[0];
-//        Command com = getCommand(command);
         assert com != null: "getCommand should return a Command enum";
         try {
             int index;
