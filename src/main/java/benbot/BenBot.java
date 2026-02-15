@@ -1,36 +1,35 @@
 package benbot;
 
-import benbot.task.Task;
-import benbot.task.Todo;
-import benbot.task.Deadline;
-import benbot.task.Event;
+import benbot.parser.Parser;
+import benbot.task.*;
 import benbot.storage.Storage;
 import benbot.exception.BenBotExceptions;
 import benbot.command.Command;
+import benbot.ui.Ui;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 import java.io.IOException;
 
 public class BenBot {
 
     private static final String FILE_PATH = "./data/benbot.txt";
     private Storage storage;
-    private List<Task> ls;
+    private TaskList ls;
+    private Ui ui;
 
     /**
      * Constructor for BenBot.
      * Initializes the storage and loads existing tasks.
      */
     public BenBot() {
+        ui = new Ui();
         storage = new Storage(FILE_PATH);
         try {
             storage.createDataFileIfNeeded();
-            ls = storage.loadFile();
+            ls = new TaskList(storage.loadFile());
         } catch (IOException | BenBotExceptions error) {
-            ls = new ArrayList<>();
+            ls = new TaskList();
         }
     }
 
@@ -39,60 +38,58 @@ public class BenBot {
      */
     public String getResponse(String input) {
         assert input != null: "Input string to getResponse cannot be null";
-        String niceInputString = input.trim();
-        String[] inputStringArray = niceInputString.split(" ", 2);
-        assert inputStringArray.length > 0: "input parsing failed to produce any tokens";
-        String command = inputStringArray[0];
-        Command com = getCommand(command);
+        Command com = Parser.parseCommand(input);
+        String arguments = Parser.parseArguments(input);
+//        String niceInputString = input.trim();
+//        String[] inputStringArray = niceInputString.split(" ", 2);
+//        assert inputStringArray.length > 0: "input parsing failed to produce any tokens";
+//        String command = inputStringArray[0];
+//        Command com = getCommand(command);
         assert com != null: "getCommand should return a Command enum";
         try {
+            int index;
+            Task itemToMark;
+            String desc;
             switch (com) {
                 case BYE:
-                    return "Bye. Hope to see you again soon!";
+                    return ui.showBye();
 
                 case LIST:
-                    StringBuilder inputList = new StringBuilder();
-                    for (int i = 0; i < ls.size(); i++) {
-                        inputList.append(i + 1 + ". " + ls.get(i) + "\n");
-                    }
-                    return inputList.toString();
+                    return ui.showList(ls);
 
                 case MARK:
-                    String[] strings = niceInputString.split(" ");
-                    Task itemToMark = ls.get(Integer.parseInt(strings[1]) - 1);
+                    index = Integer.parseInt(arguments.trim()) - 1;
+                    itemToMark = ls.getTask(index);
                     itemToMark.markDone();
                     saveTask(ls);
-                    return "Nice! I've marked this task as done:\n " + itemToMark;
+                    return ui.showMark(itemToMark);
 
                 case UNMARK:
-                    String[] strings2 = niceInputString.split(" ");
-                    Task itemToMark2 = ls.get(Integer.parseInt(strings2[1]) - 1);
-                    itemToMark2.markUndone();
+                    index = Integer.parseInt(arguments.trim()) - 1;
+                    itemToMark = ls.getTask(index);
+                    itemToMark.markUndone();
                     saveTask(ls);
-                    return "OK, I've marked this task as not done yet:\n " + itemToMark2;
+                    return ui.showUnMark(itemToMark);
 
                 case TODO:
-                    if (niceInputString.length() <= 5) {
+                    if (arguments.isEmpty()) {
                         throw new BenBotExceptions("Empty description");
                     }
-                    String todoItem = input.substring(5).trim();
-                    Task t = new Todo(todoItem);
-                    ls.add(t);
+                    Task t = new Todo(arguments);
+                    ls.addTask(t);
                     saveTask(ls);
-                    return "Got it. I've added this task:\n  " + t +
-                            "\nNow you have " + ls.size() + " tasks in the list.";
+                    return ui.showAddTask(t, ls.getSize());
 
                 case DEADLINE:
-                    String[] deadlineItem = input.split(" /by ");
+                    String[] deadlineItem = arguments.split(" /by ");
                     if (deadlineItem.length < 2) {
                         throw new BenBotExceptions("not valid deadline, use /by to specify date.\n");
                     }
-                    if (deadlineItem[0].length() <= 9) {
+                    desc = deadlineItem[0].trim();
+                    if (desc.isEmpty()) {
                         throw new BenBotExceptions("Empty description");
                     } else {
-                        String desc = deadlineItem[0].substring(9).trim();
                         String by = deadlineItem[1].trim();
-
                         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
                         LocalDateTime datetime = LocalDateTime.parse(by, formatter);
 
@@ -101,21 +98,21 @@ public class BenBot {
                         }
 
                         Task td = new Deadline(desc, by);
-                        ls.add(td);
+                        ls.addTask(td);
                         saveTask(ls);
-                        return "Got it. I've added this task:\n  " + td +
-                                "\nNow you have " + ls.size() + " tasks in the list.";
+                        return ui.showDeadline(td, ls.getSize());
                     }
 
                 case EVENT:
-                    String[] eventItem = input.split(" /from | /to ");
+                    String[] eventItem = arguments.split(" /from | /to ");
                     if (eventItem.length < 3) {
                         throw new BenBotExceptions("not valid event, use /from and /to to specify date\n");
                     }
-                    if (eventItem[0].length() <= 6) {
+                    desc = eventItem[0].trim();
+
+                    if (desc.isEmpty()) {
                         throw new BenBotExceptions("Empty description");
                     } else {
-                        String desc = eventItem[0].substring(6).trim();
                         String from = eventItem[1].trim();
                         String to = eventItem[2].trim();
 
@@ -132,74 +129,47 @@ public class BenBot {
                         }
 
                         Task te = new Event(desc, from, to);
-                        ls.add(te);
+                        ls.addTask(te);
                         saveTask(ls);
-                        return "Got it. I've added this task:\n  " + te +
-                                "\nNow you have " + ls.size() + " tasks in the list.";
+                        return ui.showEvent(te ,ls.getSize());
                     }
 
                 case DELETE:
-                    String[] deleteItem = input.split(" ");
-                    if (deleteItem.length < 2) {
+                    if (arguments.isEmpty()) {
                         throw new BenBotExceptions("Please provide number");
                     }
                     try {
-                        int index = Integer.parseInt(deleteItem[1]) - 1;
+                        index = Integer.parseInt(arguments.trim()) - 1;
 
-                        if (index < 0 || index >= ls.size()) {
+                        if (index < 0 || index >= ls.getSize()) {
                             throw new BenBotExceptions("No such item in list");
                         }
-                        Task tdel = ls.remove(index);
+                        Task taskDel = ls.removeTask(index);
                         saveTask(ls);
-                        return "Noted. I've removed this task:\n  " + tdel +
-                                "\nNow you have " + ls.size() + " tasks in the list.";
+                        return ui.showDeleteTask(taskDel, ls.getSize());
                     } catch (NumberFormatException e) {
                         throw new BenBotExceptions("Please enter a number");
                     }
 
                 case FIND:
-                    if (niceInputString.length() <= 5) {
+                    if (arguments.isEmpty()) {
                         throw new BenBotExceptions("Enter task to search using find ___");
                     }
-
-                    String keyword = niceInputString.substring(5).trim();
-                    StringBuilder foundTasks = new StringBuilder("Here are the matching tasks:\n");
-                    int matchCount = 0;
-
-                    for (int i = 0; i < ls.size(); i++) {
-                        Task task = ls.get(i);
-                        if (task.toString().contains(keyword)) {
-                            matchCount++;
-                            foundTasks.append(matchCount + "." + task + "\n");
-                        }
-                    }
-
-                    if (matchCount == 0) {
-                        return "No task found";
-                    } else {
-                        return foundTasks.toString();
-                    }
+                   return ui.showFoundTasks(ls, arguments);
 
                 default:
                     throw new BenBotExceptions("stop blabbering!");
             }
 
         } catch (Exception e) {
-            return e.getMessage();
+            return ui.showError(e.getMessage());
         }
     }
 
-    private Command getCommand(String commandWord) {
+    private void saveTask(TaskList tasks) {
+        assert tasks != null: "Attempted to save a null TaskList to storage";
         try {
-            return Command.valueOf(commandWord.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            return Command.UNKNOWN;
-        }
-    }
-    private void saveTask(List<Task> tasks) {
-        assert tasks != null: "Attempted to save a null task list to storage";
-        try {
-            storage.saveFile(tasks);
+            storage.saveFile(tasks.getAllTasks());
         } catch (IOException error) {
             System.out.println("Error saving tasks to files: " + error.getMessage());
         }
