@@ -1,7 +1,6 @@
 package benbot;
 
 import java.io.IOException;
-import java.util.Collections;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,47 +13,48 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 
-
 /**
- *
+ * An immutable control represents a dialog box consisting of an ImageView 
+ * and a label containing text from the speaker.
  */
-
 public class DialogBox extends HBox{
     @FXML
     private Label dialog;
     @FXML
     private ImageView displayPicture;
 
-    private DialogBox(String text, Image img) {
+    private DialogBox(String text, Image image) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(MainWindow.class.getResource("/view/DialogBox.fxml"));
             fxmlLoader.setController(this);
             fxmlLoader.setRoot(this);
             fxmlLoader.load();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException exception) {
+            exception.printStackTrace();
         }
 
         dialog.setText(text);
-        displayPicture.setImage(img);
+        displayPicture.setImage(image);
     }
-
+    
+    /**
+     * Flips the dialog box such that the ImageView is on the left and text on the right.
+     */
     private void flip() {
         this.setAlignment(Pos.TOP_LEFT);
-        ObservableList<Node> tmp = FXCollections.observableArrayList(this.getChildren());
-        FXCollections.reverse(tmp);
-        this.getChildren().setAll(tmp);
+        ObservableList<Node> temp = FXCollections.observableArrayList(this.getChildren());
+        FXCollections.reverse(temp);
+        this.getChildren().setAll(temp);
     }
 
-    public static DialogBox getUserDialog(String s, Image i) {
-        return new DialogBox(s, i);
+    public static DialogBox getUserDialog(String text, Image image) {
+        return new DialogBox(text, image);
     }
 
-    public static DialogBox getBenBotDialog(String s, Image i) {
-        var db = new DialogBox(s, i);
-        db.flip();
-        return db;
+    public static DialogBox getBenBotDialog(String text, Image image) {
+        var dialogBox = new DialogBox(text, image);
+        dialogBox.flip();
+        
+        return dialogBox;
     }
-
-
 }

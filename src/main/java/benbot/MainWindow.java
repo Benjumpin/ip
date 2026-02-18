@@ -8,6 +8,9 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 
+/**
+ * Controller for MainWindow. Provides the layout for the other controls.
+ */
 public class MainWindow extends AnchorPane {
     @FXML
     private ScrollPane scrollPane;
@@ -20,26 +23,39 @@ public class MainWindow extends AnchorPane {
 
     private BenBot benbot;
 
-    private Image userImage = new Image(this.getClass().getResourceAsStream("/images/DaUser.png"));
-    private Image benbotImage = new Image(this.getClass().getResourceAsStream("/images/DaDuke.png"));
-
+    private final Image userImage = new Image(this.getClass().getResourceAsStream("/images/DaUser.png"));
+    private final Image benbotImage = new Image(this.getClass().getResourceAsStream("/images/DaDuke.png"));
+    /**
+     * Initializes the scroll pane to automatically scroll to the bottom.
+     */
     @FXML
     public void initialize() {
         scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
     }
 
-    public void setBenBot(BenBot b) {
-        benbot = b;
+    /**
+     * Sets the BenBot instance for this window.
+     *
+     * @param benbot The BenBot logic instance to be injected.
+     */
+    public void setBenBot(BenBot benbot) {
+        this.benbot = benbot;
     }
-
+    
+    /**
+     * Creates two dialog boxes, one echoing user input and the other containing BenBot's reply.
+     * Clears the user input after processing.
+     */
     @FXML
     private void handleUserInput() {
         String input = userInput.getText();
         String response = benbot.getResponse(input);
+
         dialogContainer.getChildren().addAll(
                 DialogBox.getUserDialog(input, userImage),
                 DialogBox.getBenBotDialog(response, benbotImage)
         );
+
         userInput.clear();
     }
 }

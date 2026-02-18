@@ -17,9 +17,9 @@ public class Parser {
      * if no match is found.
      */
     public static Command parseCommand(String fullCommand) {
-        String[] split = fullCommand.trim().split(" ", 2);
+        String[] commandParts = fullCommand.trim().split(" ", 2);
         try{
-            return Command.valueOf(split[0].toUpperCase());
+            return Command.valueOf(commandParts[0].toUpperCase());
         } catch (IllegalArgumentException e) {
             return Command.UNKNOWN;
         }
@@ -32,8 +32,9 @@ public class Parser {
      * @return The argument string if it exists, otherwise an empty string.
      */
     public static String parseArguments(String fullCommand) {
-        String[] split = fullCommand.trim().split(" ", 2);
-        return split.length > 1 ? split[1] : "";
+        String[] commandParts = fullCommand.trim().split(" ", 2);
+        
+        return commandParts.length > 1 ? commandParts[1] : "";
 
     }
 }

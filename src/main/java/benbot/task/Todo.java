@@ -2,7 +2,7 @@ package benbot.task;
 
 /**
  * Todo class for benbot
- * Used by "Todo 'item'"
+ * Used by "Todo 'description'"
  */
 public class Todo extends Task {
     /**
@@ -21,7 +21,7 @@ public class Todo extends Task {
      */
     @Override
     public String changeFileFormat() {
-        return "T | " + (isComplete ? "1" : "0") + " | " + item;
+        return "T | " + (isComplete ? "1" : "0") + " | " + description;
     }
 
     /**

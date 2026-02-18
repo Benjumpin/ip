@@ -8,7 +8,10 @@ import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
-public class Main extends Application{
+/**
+ * A GUI for BenBot using FXML.
+ */
+public class Main extends Application {
 
     private BenBot benbot = new BenBot();
 
@@ -16,13 +19,13 @@ public class Main extends Application{
     public void start(Stage stage) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/view/MainWindow.fxml"));
-            AnchorPane ap = fxmlLoader.load();
-            Scene scene = new Scene(ap);
+            AnchorPane anchorPane = fxmlLoader.load();
+            Scene scene = new Scene(anchorPane);
             stage.setScene(scene);
-            fxmlLoader.<MainWindow>getController().setBenBot(benbot);  // inject the Duke instance
+            fxmlLoader.<MainWindow>getController().setBenBot(benbot);
             stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException exception) {
+            exception.printStackTrace();
         }
     }
 }

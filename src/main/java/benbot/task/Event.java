@@ -5,7 +5,7 @@ import java.time.format.DateTimeFormatter;
 
 /**
  * Event class for benbot
- * Used by "Event 'item' /from 'yyyy-mm-dd hh-mm' /to 'yyyy-mm-dd hh-mm'"
+ * Used by "Event 'description' /from 'yyyy-mm-dd hh-mm' /to 'yyyy-mm-dd hh-mm'"
  */
 public class Event extends Task {
 
@@ -34,7 +34,7 @@ public class Event extends Task {
     @Override
     public String changeFileFormat() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        return "E | " + (isComplete ? "1" : "0") + " | " + item + " | "
+        return "E | " + (isComplete ? "1" : "0") + " | " + description + " | "
                 + this.from + " | " + this.to.format(formatter);
     }
 

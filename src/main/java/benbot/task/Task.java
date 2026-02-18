@@ -5,16 +5,17 @@ package benbot.task;
  */
 public class Task {
     protected boolean isComplete;
-    protected String item;
+    protected String description;
 
     /**
      * Constructs a new Task with the specified description.
      *
-     * @param item The description of the task.
+     * @param description The description of the task.
      */
-    public Task(String item) {
-        assert item != null && !item.isBlank(): " Task description cannot be empty";
-        this.item = item;
+    public Task(String description) {
+        assert description != null && !description.isBlank() : " Task description cannot be empty";
+        
+        this.description = description;
         this.isComplete = false;
     }
 
@@ -48,7 +49,7 @@ public class Task {
      * @return A formatted string representation of the task for storage.
      */
     public String changeFileFormat() {
-        return String.format("? | %d | %s", this.isComplete ? 1 : 0, this.item);
+        return String.format("? | %d | %s", this.isComplete ? 1 : 0, this.description);
     }
 
     /**
@@ -58,6 +59,6 @@ public class Task {
      */
     @Override
     public String toString() {
-        return "[" + getStatus() + "] " + item;
+        return "[" + getStatus() + "] " + description;
     }
 }

@@ -1,15 +1,19 @@
 package benbot;
 
-import benbot.parser.Parser;
-import benbot.task.*;
-import benbot.storage.Storage;
-import benbot.exception.BenBotExceptions;
-import benbot.command.Command;
-import benbot.ui.Ui;
-
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.io.IOException;
+
+import benbot.command.Command;
+import benbot.exception.BenBotException;
+import benbot.parser.Parser;
+import benbot.storage.Storage;
+import benbot.task.Deadline;
+import benbot.task.Event;
+import benbot.task.Task;
+import benbot.task.TaskList;
+import benbot.task.Todo;
+import benbot.ui.Ui;
 
 
 /**
@@ -20,21 +24,21 @@ public class BenBot {
 
     private static final String FILE_PATH = "./data/benbot.txt";
     private Storage storage;
-    private TaskList ls;
-    private Ui ui;
+    private TaskList tasks;
+    private Ui userInterface;
 
     /**
      * Constructor for BenBot.
      * Initializes the storage and loads existing tasks.
      */
     public BenBot() {
-        ui = new Ui();
+        userInterface = new Ui();
         storage = new Storage(FILE_PATH);
         try {
             storage.createDataFileIfNeeded();
-            ls = new TaskList(storage.loadFile());
-        } catch (IOException | BenBotExceptions error) {
-            ls = new TaskList();
+            tasks = new TaskList(storage.loadFile());
+        } catch (IOException | BenBotException error) {
+            tasks = new TaskList();
         }
     }
 
@@ -46,135 +50,147 @@ public class BenBot {
      */
     public String getResponse(String input) {
         assert input != null: "Input string to getResponse cannot be null";
-        Command com = Parser.parseCommand(input);
+        
+        Command command = Parser.parseCommand(input);
         String arguments = Parser.parseArguments(input);
-        assert com != null: "getCommand should return a Command enum";
+        
+        assert command != null: "getCommand should return a Command enum";
+        
         try {
-            int index;
-            Task itemToMark;
-            String desc;
-            switch (com) {
-                case BYE:
-                    return ui.showBye();
+ 
+            switch (command) {
+            case BYE:
+                return userInterface.showBye();
 
-                case LIST:
-                    return ui.showList(ls);
+            case LIST:
+                return userInterface.showList(tasks);
 
-                case MARK:
-                    index = Integer.parseInt(arguments.trim()) - 1;
-                    itemToMark = ls.getTask(index);
-                    itemToMark.markDone();
-                    saveTask(ls);
-                    return ui.showMark(itemToMark);
+            case MARK:
+                int markIndex = Integer.parseInt(arguments.trim()) - 1;
+                Task itemToMark = tasks.getTask(markIndex);
+                
+                itemToMark.markDone();
+                saveTask(tasks);
+                
+                return userInterface.showMark(itemToMark);
 
-                case UNMARK:
-                    index = Integer.parseInt(arguments.trim()) - 1;
-                    itemToMark = ls.getTask(index);
-                    itemToMark.markUndone();
-                    saveTask(ls);
-                    return ui.showUnMark(itemToMark);
+            case UNMARK:
+                int unmarkIndex = Integer.parseInt(arguments.trim()) - 1;
+                Task itemToUnmark = tasks.getTask(unmarkIndex);
 
-                case TODO:
-                    if (arguments.isEmpty()) {
-                        throw new BenBotExceptions("Empty description");
-                    }
-                    Task t = new Todo(arguments);
-                    ls.addTask(t);
-                    saveTask(ls);
-                    return ui.showAddTask(t, ls.getSize());
+                itemToUnmark.markUndone();
+                saveTask(tasks);
+                
+                return userInterface.showUnMark(itemToUnmark);
 
-                case DEADLINE:
-                    String[] deadlineItem = arguments.split(" /by ");
-                    if (deadlineItem.length < 2) {
-                        throw new BenBotExceptions("not valid deadline, use /by to specify date.\n");
-                    }
-                    desc = deadlineItem[0].trim();
-                    if (desc.isEmpty()) {
-                        throw new BenBotExceptions("Empty description");
-                    } else {
-                        String by = deadlineItem[1].trim();
-                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-                        LocalDateTime datetime = LocalDateTime.parse(by, formatter);
+            case TODO:
+                if (arguments.isEmpty()) {
+                    throw new BenBotException("Empty description");
+                }
+                
+                Task todoTask = new Todo(arguments);
+                tasks.addTask(todoTask);
+                saveTask(tasks);
+                
+                return userInterface.showAddTask(todoTask, tasks.getSize());
 
-                        if (datetime.isBefore(LocalDateTime.now())) {
-                            throw new BenBotExceptions("You cannot set a deadline in the past!");
-                        }
+            case DEADLINE:
+                String[] deadlineItems = arguments.split(" /by ");
+                if (deadlineItems.length < 2) {
+                    throw new BenBotException("not valid deadline, use /by to specify date.\n");
+                }
+                
+                String deadlineDescription = deadlineItems[0].trim();
+                if (deadlineDescription.isEmpty()) {
+                    throw new BenBotException("Empty description");
+                    
+                } else {
+                    String by = deadlineItems[1].trim();
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+                    LocalDateTime datetime = LocalDateTime.parse(by, formatter);
 
-                        Task td = new Deadline(desc, by);
-                        ls.addTask(td);
-                        saveTask(ls);
-                        return ui.showDeadline(td, ls.getSize());
-                    }
-
-                case EVENT:
-                    String[] eventItem = arguments.split(" /from | /to ");
-                    if (eventItem.length < 3) {
-                        throw new BenBotExceptions("not valid event, use /from and /to to specify date\n");
-                    }
-                    desc = eventItem[0].trim();
-
-                    if (desc.isEmpty()) {
-                        throw new BenBotExceptions("Empty description");
-                    } else {
-                        String from = eventItem[1].trim();
-                        String to = eventItem[2].trim();
-
-                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-                        LocalDateTime fromDate = LocalDateTime.parse(from, formatter);
-                        LocalDateTime toDate = LocalDateTime.parse(to, formatter);
-
-                        if (fromDate.isBefore(LocalDateTime.now())) {
-                            throw new BenBotExceptions("You cannot set a date in the past!");
-                        }
-
-                        if (toDate.isBefore(fromDate)) {
-                            throw new BenBotExceptions("Can't set end date before start date!");
-                        }
-
-                        Task te = new Event(desc, from, to);
-                        ls.addTask(te);
-                        saveTask(ls);
-                        return ui.showEvent(te ,ls.getSize());
+                    if (datetime.isBefore(LocalDateTime.now())) {
+                        throw new BenBotException("You cannot set a deadline in the past!");
                     }
 
-                case DELETE:
-                    if (arguments.isEmpty()) {
-                        throw new BenBotExceptions("Please provide number");
-                    }
-                    try {
-                        index = Integer.parseInt(arguments.trim()) - 1;
+                    Task deadlineTask = new Deadline(deadlineDescription, by);
+                    tasks.addTask(deadlineTask);
+                    saveTask(tasks);
+                    
+                    return userInterface.showDeadline(deadlineTask, tasks.getSize());
+                }
 
-                        if (index < 0 || index >= ls.getSize()) {
-                            throw new BenBotExceptions("No such item in list");
-                        }
-                        Task taskDel = ls.removeTask(index);
-                        saveTask(ls);
-                        return ui.showDeleteTask(taskDel, ls.getSize());
-                    } catch (NumberFormatException e) {
-                        throw new BenBotExceptions("Please enter a number");
+            case EVENT:
+                String[] eventItems = arguments.split(" /from | /to ");
+                if (eventItems.length < 3) {
+                    throw new BenBotException("not valid event, use /from and /to to specify date\n");
+                }
+                
+                String eventDescription = eventItems[0].trim();
+                if (eventDescription.isEmpty()) {
+                    throw new BenBotException("Empty description");
+                    
+                } else {
+                    String from = eventItems[1].trim();
+                    String to = eventItems[2].trim();
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+                    LocalDateTime fromDate = LocalDateTime.parse(from, formatter);
+                    LocalDateTime toDate = LocalDateTime.parse(to, formatter);
+
+                    if (fromDate.isBefore(LocalDateTime.now())) {
+                        throw new BenBotException("You cannot set a date in the past!");
+                    }
+                    if (toDate.isBefore(fromDate)) {
+                        throw new BenBotException("Can't set end date before start date!");
                     }
 
-                case FIND:
-                    if (arguments.isEmpty()) {
-                        throw new BenBotExceptions("Enter task to search using find ___");
-                    }
-                   return ui.showFoundTasks(ls, arguments);
+                    Task eventTask = new Event(eventDescription, from, to);
+                    tasks.addTask(eventTask);
+                    saveTask(tasks);
+                    
+                    return userInterface.showEvent(eventTask, tasks.getSize());
+                }
 
-                default:
-                    throw new BenBotExceptions("stop blabbering!");
+            case DELETE:
+                if (arguments.isEmpty()) {
+                    throw new BenBotException("Please provide number");
+                }
+                
+                try {
+                    int deleteIndex = Integer.parseInt(arguments.trim()) - 1;
+                    if (deleteIndex < 0 || deleteIndex >= tasks.getSize()) {
+                        throw new BenBotException("No such description in list");
+                    }
+                    Task deleteTask = tasks.removeTask(deleteIndex);
+                    saveTask(tasks);
+                    
+                    return userInterface.showDeleteTask(deleteTask, tasks.getSize());
+                } catch (NumberFormatException e) {
+                    throw new BenBotException("Please enter a number");
+                }
+
+            case FIND:
+                if (arguments.isEmpty()) {
+                    throw new BenBotException("Enter task to search using find ___");
+                }
+                
+                return userInterface.showFoundTasks(tasks, arguments);
+
+            default:
+                throw new BenBotException("stop blabbering!");
             }
-
-        } catch (Exception e) {
-            return ui.showError(e.getMessage());
+        } catch (Exception exception) {
+            return userInterface.showError(exception.getMessage());
         }
     }
 
     private void saveTask(TaskList tasks) {
         assert tasks != null: "Attempted to save a null TaskList to storage";
+        
         try {
             storage.saveFile(tasks.getAllTasks());
-        } catch (IOException error) {
-            System.out.println("Error saving tasks to files: " + error.getMessage());
+        } catch (IOException exception) {
+            System.out.println("Error saving tasks to files: " + exception.getMessage());
         }
     }
 }

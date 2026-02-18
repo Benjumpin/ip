@@ -5,7 +5,7 @@ import java.time.format.DateTimeFormatter;
 
 /**
  * Deadline class for benbot
- * Used by "Deadline 'item' /by 'yyyy-mm-dd hh-mm'"
+ * Used by "Deadline 'description' /by 'yyyy-mm-dd hh-mm'"
  */
 public class Deadline extends Task {
 
@@ -31,7 +31,7 @@ public class Deadline extends Task {
     @Override
     public String changeFileFormat() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        return "D | " + (isComplete ? "1" : "0") + " | " + item + " | " + this.by.format(formatter);
+        return "D | " + (isComplete ? "1" : "0") + " | " + description + " | " + this.by.format(formatter);
     }
 
     /**

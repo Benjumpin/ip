@@ -3,11 +3,10 @@ package benbot.ui;
 import benbot.task.Task;
 import benbot.task.TaskList;
 
+/**
+ * Handles the user interface messages for the BenBot application.
+ */
 public class Ui {
-    public String showWelcome() {
-        return "Hello! I'm BenBot. How can I help you today?";
-    }
-
     public String showBye() {
         return "Bye. Hope to see you again soon!";
     }
@@ -40,34 +39,41 @@ public class Ui {
                 "\nNow you have " + size + " tasks in the list.";
     }
 
-    public String showError(String msg) {
-        return "Error " + msg;
+    public String showError(String message) {
+        return "Error " + message;
     }
 
     public String showList(TaskList taskList) {
         if (taskList.getSize() == 0) {
             return "Your list is currently empty.";
         }
-        StringBuilder sb = new StringBuilder("Here are the tasks in your list:\n");
+        
+        StringBuilder stringBuilder = new StringBuilder("Here are the tasks in your list:\n");
+        
         for (int i = 0; i < taskList.getSize(); i++) {
-            sb.append((i + 1)).append(". ").append(taskList.getTask(i)).append("\n");
+            stringBuilder.append((i + 1)).append(". ").append(taskList.getTask(i)).append("\n");
         }
-        return sb.toString().trim();
+        
+        return stringBuilder.toString().trim();
     }
 
     public String showFoundTasks(TaskList taskList, String keyword) {
-        StringBuilder sb = new StringBuilder("Here are the matching tasks in your list:\n");
+        StringBuilder stringBuilder = new StringBuilder("Here are the matching tasks in your list:\n");
         int matchCount = 0;
+        
         for (int i = 0; i < taskList.getSize(); i++) {
             Task task = taskList.getTask(i);
+            
             if (task.toString().contains(keyword)) {
                 matchCount++;
-                sb.append(matchCount).append(".").append(task).append("\n");
+                stringBuilder.append(matchCount).append(".").append(task).append("\n");
             }
         }
+        
         if (matchCount == 0) {
             return "No tasks found matching: " + keyword;
         }
-        return sb.toString().trim();
+        
+        return stringBuilder.toString().trim();
     }
 }
