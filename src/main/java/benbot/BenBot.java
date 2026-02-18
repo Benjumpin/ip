@@ -57,133 +57,143 @@ public class BenBot {
         assert command != null: "getCommand should return a Command enum";
         
         try {
- 
-            switch (command) {
-            case BYE:
-                return userInterface.showBye();
-
-            case LIST:
-                return userInterface.showList(tasks);
-
-            case MARK:
-                int markIndex = Integer.parseInt(arguments.trim()) - 1;
-                Task itemToMark = tasks.getTask(markIndex);
-                
-                itemToMark.markDone();
-                saveTask(tasks);
-                
-                return userInterface.showMark(itemToMark);
-
-            case UNMARK:
-                int unmarkIndex = Integer.parseInt(arguments.trim()) - 1;
-                Task itemToUnmark = tasks.getTask(unmarkIndex);
-
-                itemToUnmark.markUndone();
-                saveTask(tasks);
-                
-                return userInterface.showUnMark(itemToUnmark);
-
-            case TODO:
-                if (arguments.isEmpty()) {
-                    throw new BenBotException("Empty description");
-                }
-                
-                Task todoTask = new Todo(arguments);
-                tasks.addTask(todoTask);
-                saveTask(tasks);
-                
-                return userInterface.showAddTask(todoTask, tasks.getSize());
-
-            case DEADLINE:
-                String[] deadlineItems = arguments.split(" /by ");
-                if (deadlineItems.length < 2) {
-                    throw new BenBotException("not valid deadline, use /by to specify date.\n");
-                }
-                
-                String deadlineDescription = deadlineItems[0].trim();
-                if (deadlineDescription.isEmpty()) {
-                    throw new BenBotException("Empty description");
-                    
-                } else {
-                    String by = deadlineItems[1].trim();
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-                    LocalDateTime datetime = LocalDateTime.parse(by, formatter);
-
-                    if (datetime.isBefore(LocalDateTime.now())) {
-                        throw new BenBotException("You cannot set a deadline in the past!");
-                    }
-
-                    Task deadlineTask = new Deadline(deadlineDescription, by);
-                    tasks.addTask(deadlineTask);
-                    saveTask(tasks);
-                    
-                    return userInterface.showDeadline(deadlineTask, tasks.getSize());
-                }
-
-            case EVENT:
-                String[] eventItems = arguments.split(" /from | /to ");
-                if (eventItems.length < 3) {
-                    throw new BenBotException("not valid event, use /from and /to to specify date\n");
-                }
-                
-                String eventDescription = eventItems[0].trim();
-                if (eventDescription.isEmpty()) {
-                    throw new BenBotException("Empty description");
-                    
-                } else {
-                    String from = eventItems[1].trim();
-                    String to = eventItems[2].trim();
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-                    LocalDateTime fromDate = LocalDateTime.parse(from, formatter);
-                    LocalDateTime toDate = LocalDateTime.parse(to, formatter);
-
-                    if (fromDate.isBefore(LocalDateTime.now())) {
-                        throw new BenBotException("You cannot set a date in the past!");
-                    }
-                    if (toDate.isBefore(fromDate)) {
-                        throw new BenBotException("Can't set end date before start date!");
-                    }
-
-                    Task eventTask = new Event(eventDescription, from, to);
-                    tasks.addTask(eventTask);
-                    saveTask(tasks);
-                    
-                    return userInterface.showEvent(eventTask, tasks.getSize());
-                }
-
-            case DELETE:
-                if (arguments.isEmpty()) {
-                    throw new BenBotException("Please provide number");
-                }
-                
-                try {
-                    int deleteIndex = Integer.parseInt(arguments.trim()) - 1;
-                    if (deleteIndex < 0 || deleteIndex >= tasks.getSize()) {
-                        throw new BenBotException("No such description in list");
-                    }
-                    Task deleteTask = tasks.removeTask(deleteIndex);
-                    saveTask(tasks);
-                    
-                    return userInterface.showDeleteTask(deleteTask, tasks.getSize());
-                } catch (NumberFormatException e) {
-                    throw new BenBotException("Please enter a number");
-                }
-
-            case FIND:
-                if (arguments.isEmpty()) {
-                    throw new BenBotException("Enter task to search using find ___");
-                }
-                
-                return userInterface.showFoundTasks(tasks, arguments);
-
-            default:
-                throw new BenBotException("stop blabbering!");
-            }
-        } catch (Exception exception) {
+            return executeCommand(command, arguments);
+        } catch (BenBotException exception) {
             return userInterface.showError(exception.getMessage());
+        } catch (Exception exception) {
+            return userInterface.showError("Sorry! Unexpected error occured: " + exception.getMessage());
         }
     }
+    
+    private String executeCommand(Command command, String arguments) throws BenBotException {
+        switch (command) {
+        case BYE:
+            return userInterface.showBye();
+        case LIST:
+            return userInterface.showList(tasks);
+        case MARK:
+            return handleMark(arguments);
+        case UNMARK:
+            return handleUnmark(arguments);
+        case TODO:
+            return handleTodo(arguments);
+        case DEADLINE:
+            return handleDeadline(arguments);
+        case EVENT:
+            return handleEvent(arguments);
+        case DELETE:
+            return handleDelete(arguments);
+        case FIND:
+            return handleFind(arguments);
+        default:
+            throw new BenBotException("stop blabbering!");
+        }
+    }
+    
+    private String handleMark(String arguments) {
+        int index = Integer.parseInt(arguments.trim()) - 1;
+        Task task = tasks.getTask(index);
 
+        task.markDone();
+        saveTask(tasks);
+
+        return userInterface.showMark(task);
+    }
+    
+    private String handleUnmark(String arguments) {
+        int index = Integer.parseInt(arguments.trim()) - 1;
+        Task task = tasks.getTask(index);
+
+        task.markUndone();
+        saveTask(tasks);
+
+        return userInterface.showUnMark(task);
+    }
+    
+    private String handleTodo(String arguments) throws BenBotException {
+        if (arguments.isEmpty()) {
+            throw new BenBotException("Empty description");
+        }
+
+        Task todoTask = new Todo(arguments);
+        tasks.addTask(todoTask);
+        saveTask(tasks);
+
+        return userInterface.showAddTask(todoTask, tasks.getSize());
+    }
+
+    private String handleDeadline(String arguments) throws BenBotException {
+        String[] deadlineItems = arguments.split(" /by ");
+        if (deadlineItems.length < 2) {
+            throw new BenBotException("not valid deadline, use /by to specify date.\n");
+        }
+
+        String description = deadlineItems[0].trim();
+        if (description.isEmpty()) {
+            throw new BenBotException("Empty description");
+        }
+
+        String by = deadlineItems[1].trim();
+        Task deadlineTask = new Deadline(description, by);
+        tasks.addTask(deadlineTask);
+        saveTask(tasks);
+
+        return userInterface.showDeadline(deadlineTask, tasks.getSize());
+    }
+
+    private String handleEvent(String arguments) throws BenBotException {
+        String[] parts = arguments.split(" /from | /to ");
+        if (parts.length < 3) {
+            throw new BenBotException("not valid event, use /from and /to to specify dates\n");
+        }
+
+        String description = parts[0].trim();
+        if (description.isEmpty()) {
+            throw new BenBotException("Empty description");
+        }
+
+        String from = parts[1].trim();
+        String to = parts[2].trim();
+
+        // Add date validation logic here if needed...
+
+        Task eventTask = new Event(description, from, to);
+        tasks.addTask(eventTask);
+        saveTask(tasks);
+
+        return userInterface.showEvent(eventTask, tasks.getSize());
+    }
+
+    private String handleDelete(String arguments) throws BenBotException {
+        if (arguments.isEmpty()) {
+            throw new BenBotException("Please provide a task number");
+        }
+        
+        int index;
+        try {
+            index = Integer.parseInt(arguments.trim()) - 1;
+        } catch (NumberFormatException e) {
+            throw new BenBotException("Please enter a valid number");
+        }
+        
+        if (index < 0 || index >= tasks.getSize()) {
+            throw new BenBotException("No such task in list");
+        }
+
+        Task task = tasks.removeTask(index);
+        saveTask(tasks);
+
+        return userInterface.showDeleteTask(task, tasks.getSize());
+    }
+
+    private String handleFind(String arguments) throws BenBotException {
+        if (arguments.isEmpty()) {
+            throw new BenBotException("Enter task to search using find <keyword>");
+        }
+
+        return userInterface.showFoundTasks(tasks, arguments);
+    }
+    
     private void saveTask(TaskList tasks) {
         assert tasks != null: "Attempted to save a null TaskList to storage";
         
