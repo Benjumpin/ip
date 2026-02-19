@@ -17,9 +17,9 @@ public class Parser {
      * if no match is found.
      */
     public static Command parseCommand(String fullCommand) {
-        String[] commandParts = fullCommand.trim().split(" ", 2);
+        String commandWord = getPart(fullCommand, 0);
         try{
-            return Command.valueOf(commandParts[0].toUpperCase());
+            return Command.valueOf(commandWord.toUpperCase());
         } catch (IllegalArgumentException e) {
             return Command.UNKNOWN;
         }
@@ -32,9 +32,21 @@ public class Parser {
      * @return The argument string if it exists, otherwise an empty string.
      */
     public static String parseArguments(String fullCommand) {
-        String[] commandParts = fullCommand.trim().split(" ", 2);
-        
-        return commandParts.length > 1 ? commandParts[1] : "";
-
+        return getPart(fullCommand, 1);
+    }
+    
+    /**
+     * Splits the input and returns the requested part (0 for command, 1 for args).
+     * This is a private helper to maintain a Single Level of Abstraction.
+     */
+    private static String getPart(String input, int index) {
+        if (input == null || input.isBlank()) {
+            return "";
+        }
+        String[] parts = input.trim().split("\\s+", 2);
+        if (index == 0) {
+            return parts[0];
+        }
+        return parts.length > 1 ? parts[1] : "";
     }
 }
