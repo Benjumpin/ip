@@ -76,4 +76,18 @@ public class Ui {
         
         return stringBuilder.toString().trim();
     }
+    
+    public String showHelp() {
+        return "Here are the available commands:\n"
+                + "<time> format: <yyyy-MM-dd HH:mm>\n"
+                + "1. todo <desc> - Adds a todo task\n"
+                + "2. deadline <desc> /by <time> - Adds a deadline\n"
+                + "3. event <desc> /from <time> /to <time> - Adds an event\n"
+                + "4. list - Shows all tasks\n"
+                + "5. mark <index> - Marks task as done\n"
+                + "6. unmark <index> - Marks task as undone\n"
+                + "7. delete <index> - Removes a task\n"
+                + "8. find <keyword> - Searches for tasks\n"
+                + "9. bye - Exits the app";
+    }
 }
