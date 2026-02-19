@@ -19,7 +19,6 @@ import benbot.ui.Ui;
 /**
  * The main logic for the BenBot chatbot.
  */
-
 public class BenBot {
 
     private static final String FILE_PATH = "./data/benbot.txt";
