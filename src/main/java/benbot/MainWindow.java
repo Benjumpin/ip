@@ -32,14 +32,18 @@ public class MainWindow extends AnchorPane {
     public void initialize() {
         scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
     }
-
+    
     /**
-     * Sets the BenBot instance for this window.
+     * Sets the BenBot instance for this window and Displays the opening message.
      *
      * @param benbot The BenBot logic instance to be injected.
      */
     public void setBenBot(BenBot benbot) {
         this.benbot = benbot;
+        String welcomeMessage = benbot.getWelcome();
+        dialogContainer.getChildren().add(
+                DialogBox.getBenBotDialog(welcomeMessage, benbotImage)
+        );
     }
     
     /**

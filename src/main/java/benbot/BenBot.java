@@ -37,11 +37,22 @@ public class BenBot {
         try {
             storage.createDataFileIfNeeded();
             tasks = new TaskList(storage.loadFile());
+            
         } catch (IOException | BenBotException error) {
             tasks = new TaskList();
         }
     }
 
+    /**
+     * Returns a welcome message and the current task list.
+     */
+    public String getWelcome() {
+        StringBuilder sb = new StringBuilder("Hello! I'm BenBot.\n");
+        sb.append(userInterface.showList(tasks));
+        sb.append("\n\nTip: Type 'help' if you're not sure how to start!");
+        return sb.toString();
+    }
+    
     /**
      * Generates a response based on user input.
      *
@@ -85,6 +96,8 @@ public class BenBot {
             return handleDelete(arguments);
         case FIND:
             return handleFind(arguments);
+        case HELP:
+            return userInterface.showHelp();
         default:
             throw new BenBotException("stop blabbering!");
         }
