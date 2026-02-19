@@ -50,6 +50,7 @@ public class BenBot {
         StringBuilder sb = new StringBuilder("Hello! I'm BenBot.\n");
         sb.append(userInterface.showList(tasks));
         sb.append("\n\nTip: Type 'help' if you're not sure how to start!");
+        
         return sb.toString();
     }
     
