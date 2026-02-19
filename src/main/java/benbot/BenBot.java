@@ -1,8 +1,6 @@
 package benbot;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 import benbot.command.Command;
 import benbot.exception.BenBotException;
@@ -46,11 +44,11 @@ public class BenBot {
      * Returns a welcome message and the current task list.
      */
     public String getWelcome() {
-        StringBuilder sb = new StringBuilder("Hello! I'm BenBot.\n");
-        sb.append(userInterface.showList(tasks));
-        sb.append("\n\nTip: Type 'help' if you're not sure how to start!");
+        StringBuilder stringBuilder = new StringBuilder("Hello! I'm BenBot.\n");
+        stringBuilder.append(userInterface.showList(tasks));
+        stringBuilder.append("\n\nTip: Type 'help' if you're not sure how to start!");
         
-        return sb.toString();
+        return stringBuilder.toString();
     }
     
     /**
