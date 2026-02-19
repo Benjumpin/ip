@@ -25,6 +25,7 @@ public class MainWindow extends AnchorPane {
 
     private final Image userImage = new Image(this.getClass().getResourceAsStream("/images/DaUser.png"));
     private final Image benbotImage = new Image(this.getClass().getResourceAsStream("/images/DaDuke.png"));
+    
     /**
      * Initializes the scroll pane to automatically scroll to the bottom.
      */
