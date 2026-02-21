@@ -34,7 +34,6 @@ public class BenBot {
         try {
             storage.createDataFileIfNeeded();
             tasks = new TaskList(storage.loadFile());
-            
         } catch (IOException | BenBotException error) {
             tasks = new TaskList();
         }
@@ -47,7 +46,6 @@ public class BenBot {
         StringBuilder stringBuilder = new StringBuilder("Hello! I'm BenBot.\n");
         stringBuilder.append(userInterface.showList(tasks));
         stringBuilder.append("\n\nTip: Type 'help' if you're not sure how to start!");
-        
         return stringBuilder.toString();
     }
     
@@ -58,12 +56,12 @@ public class BenBot {
      * @return The formatted response string from BenBot.
      */
     public String getResponse(String input) {
-        assert input != null: "Input string to getResponse cannot be null";
+        assert input != null : "Input string to getResponse cannot be null";
         
         Command command = Parser.parseCommand(input);
         String arguments = Parser.parseArguments(input);
         
-        assert command != null: "getCommand should return a Command enum";
+        assert command != null : "getCommand should return a Command enum";
         
         try {
             return executeCommand(command, arguments);
@@ -107,7 +105,6 @@ public class BenBot {
 
         task.markDone();
         saveTask(tasks);
-
         return userInterface.showMark(task);
     }
     
@@ -117,7 +114,6 @@ public class BenBot {
 
         task.markUndone();
         saveTask(tasks);
-
         return userInterface.showUnMark(task);
     }
     
@@ -129,7 +125,6 @@ public class BenBot {
         Task todoTask = new Todo(arguments);
         tasks.addTask(todoTask);
         saveTask(tasks);
-
         return userInterface.showAddTask(todoTask, tasks.getSize());
     }
 
@@ -148,7 +143,6 @@ public class BenBot {
         Task deadlineTask = new Deadline(description, by);
         tasks.addTask(deadlineTask);
         saveTask(tasks);
-
         return userInterface.showDeadline(deadlineTask, tasks.getSize());
     }
 
@@ -169,7 +163,6 @@ public class BenBot {
         Task eventTask = new Event(description, from, to);
         tasks.addTask(eventTask);
         saveTask(tasks);
-
         return userInterface.showEvent(eventTask, tasks.getSize());
     }
 
@@ -191,7 +184,6 @@ public class BenBot {
 
         Task task = tasks.removeTask(index);
         saveTask(tasks);
-
         return userInterface.showDeleteTask(task, tasks.getSize());
     }
 
@@ -204,7 +196,7 @@ public class BenBot {
     }
     
     private void saveTask(TaskList tasks) {
-        assert tasks != null: "Attempted to save a null TaskList to storage";
+        assert tasks != null : "Attempted to save a null TaskList to storage";
         
         try {
             storage.saveFile(tasks.getAllTasks());

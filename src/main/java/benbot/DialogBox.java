@@ -17,7 +17,7 @@ import javafx.scene.layout.HBox;
  * An immutable control represents a dialog box consisting of an ImageView 
  * and a label containing text from the speaker.
  */
-public class DialogBox extends HBox{
+public class DialogBox extends HBox {
     @FXML
     private Label dialog;
     @FXML
@@ -35,7 +35,7 @@ public class DialogBox extends HBox{
 
         dialog.setText(text);
         displayPicture.setImage(image);
-    }
+    }    
     
     /**
      * Flips the dialog box such that the ImageView is on the left and text on the right.
@@ -54,7 +54,6 @@ public class DialogBox extends HBox{
     public static DialogBox getBenBotDialog(String text, Image image) {
         var dialogBox = new DialogBox(text, image);
         dialogBox.flip();
-        
         return dialogBox;
     }
 }

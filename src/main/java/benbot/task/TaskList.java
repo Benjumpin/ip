@@ -1,7 +1,7 @@
 package benbot.task;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents a list of tasks in the BenBot application.

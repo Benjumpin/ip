@@ -18,7 +18,7 @@ public class Parser {
      */
     public static Command parseCommand(String fullCommand) {
         String commandWord = getPart(fullCommand, 0);
-        try{
+        try { 
             return Command.valueOf(commandWord.toUpperCase());
         } catch (IllegalArgumentException e) {
             return Command.UNKNOWN;

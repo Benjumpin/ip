@@ -11,38 +11,62 @@ public class Ui {
         return "Bye. Hope to see you again soon!";
     }
 
+    /**
+     * Handles the user interface message "Add Task" for the BenBot application.
+     */
     public String showAddTask(Task task, int totalTasks) {
-        return "Got it. I've added this task:\n  " + task +
-                "\nNow you have " + totalTasks + " tasks in the list.";
+        return "Got it. I've added this task:\n  " + task 
+                + "\nNow you have " + totalTasks + " tasks in the list.";
     }
 
+    /**
+     * Handles the user interface message "Delete Task" for the BenBot application.
+     */
     public String showDeleteTask(Task task, int totalTasks) {
-        return "Noted. I've removed this task:\n  " + task +
-                "\nNow you have " + totalTasks + " tasks in the list.";
+        return "Noted. I've removed this task:\n  " + task 
+                + "\nNow you have " + totalTasks + " tasks in the list.";
     }
-
+    
+    /**
+     * Handles the user interface message "Mark Task" for the BenBot application.
+     */
     public String showMark(Task itemToMark) {
         return "Nice! I've marked this task as done:\n " + itemToMark;
     }
 
+    /**
+     * Handles the user interface message "Unmark Task" for the BenBot application.
+     */
     public String showUnMark(Task itemToMark) {
         return "OK, I've marked this task as not done yet:\n " + itemToMark;
     }
 
+    /**
+     * Handles the user interface message "Event" for the BenBot application.
+     */
     public String showEvent(Task item, int size) {
-        return "Got it. I've added this task:\n  " + item +
-                "\nNow you have " + size + " tasks in the list.";
+        return "Got it. I've added this task:\n  " + item 
+                + "\nNow you have " + size + " tasks in the list.";
     }
 
+    /**
+     * Handles the user interface message "Deadline" for the BenBot application.
+     */
     public String showDeadline(Task item, int size) {
-        return "Got it. I've added this task:\n  " + item +
-                "\nNow you have " + size + " tasks in the list.";
+        return "Got it. I've added this task:\n  " + item 
+                + "\nNow you have " + size + " tasks in the list.";
     }
 
+    /**
+     * Handles the user interface error message for the BenBot application.
+     */
     public String showError(String message) {
         return "Error " + message;
     }
 
+    /**
+     * Handles the user interface message "List" for the BenBot application.
+     */
     public String showList(TaskList taskList) {
         if (taskList.getSize() == 0) {
             return "Your list is currently empty.";
@@ -57,6 +81,9 @@ public class Ui {
         return stringBuilder.toString().trim();
     }
 
+    /**
+     * Handles the user interface message "Find" for the BenBot application.
+     */
     public String showFoundTasks(TaskList taskList, String keyword) {
         StringBuilder stringBuilder = new StringBuilder("Here are the matching tasks in your list:\n");
         int matchCount = 0;
@@ -77,6 +104,9 @@ public class Ui {
         return stringBuilder.toString().trim();
     }
     
+    /**
+     * Help list for all BenBot commands
+     */
     public String showHelp() {
         return "Here are the available commands:\n"
                 + "<time> format: <yyyy-MM-dd HH:mm>\n"
