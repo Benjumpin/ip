@@ -5,6 +5,7 @@ package benbot.task;
  * Used by "Todo 'description'"
  */
 public class Todo extends Task {
+    
     /**
      * Constructs a Todo task with the specified description.
      *

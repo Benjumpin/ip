@@ -24,7 +24,6 @@ public class Storage {
     
     /**
      * Constructs a Storage object with a specified file path.
-     *
      * @param filePath The relative or absolute path to the data file.
      */
     public Storage(String filePath) {
