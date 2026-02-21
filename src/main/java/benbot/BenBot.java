@@ -166,8 +166,6 @@ public class BenBot {
         String from = parts[1].trim();
         String to = parts[2].trim();
 
-        // Add date validation logic here if needed...
-
         Task eventTask = new Event(description, from, to);
         tasks.addTask(eventTask);
         saveTask(tasks);

@@ -1,7 +1,7 @@
-# Duke User Guide
+# BenBot User Guide
 
-// Update the title above to match the actual product name
-
+BenBot is a desktop task management application optimized for use via a Command Line Interface (CLI) while providing a clean, 
+visual chat experience powered by JavaFX.
 // Product screenshot goes here
 
 // Product intro goes here

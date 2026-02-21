@@ -2,6 +2,9 @@ package benbot.task;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+
+import benbot.exception.BenBotException;
 
 /**
  * Deadline class for benbot
@@ -17,10 +20,16 @@ public class Deadline extends Task {
      * @param description The description of the task.
      * @param by The deadline date string in "yyyy-MM-dd HH:mm" format.
      */
-    public Deadline(String description, String by) {
+    public Deadline(String description, String by) throws BenBotException {
         super(description);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        this.by = LocalDateTime.parse(by, formatter);
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            this.by = LocalDateTime.parse(by, formatter);
+        } catch (DateTimeParseException e) {
+            throw new BenBotException("Oops! The deadline format is wrong. "
+                    + "Please use: yyyy-MM-dd HH:mm (e.g., 2026-02-23 18:00)");
+        }
+        
     }
 
     /**
