@@ -29,7 +29,6 @@ public class Deadline extends Task {
             throw new BenBotException("Oops! The deadline format is wrong. "
                     + "Please use: yyyy-MM-dd HH:mm (e.g., 2026-02-23 18:00)");
         }
-        
     }
 
     /**

@@ -70,7 +70,7 @@ public class BenBot {
         } catch (BenBotException exception) {
             return userInterface.showError(exception.getMessage());
         } catch (Exception exception) {
-            return userInterface.showError("Sorry! Unexpected error occured: " + exception.getMessage());
+            return userInterface.showError("Sorry! Unexpected error occurred: " + exception.getMessage());
         }
     }
     
@@ -136,7 +136,7 @@ public class BenBot {
     private String handleDeadline(String arguments) throws BenBotException {
         String[] deadlineItems = arguments.split(" /by ");
         if (deadlineItems.length < 2) {
-            throw new BenBotException("not valid deadline, use /by to specify date.\n");
+            throw new BenBotException("Not valid deadline, use /by to specify date.\n");
         }
 
         String description = deadlineItems[0].trim();
@@ -155,7 +155,7 @@ public class BenBot {
     private String handleEvent(String arguments) throws BenBotException {
         String[] parts = arguments.split(" /from | /to ");
         if (parts.length < 3) {
-            throw new BenBotException("not valid event, use /from and /to to specify dates\n");
+            throw new BenBotException("Not valid event, use /from and /to to specify dates\n");
         }
 
         String description = parts[0].trim();
