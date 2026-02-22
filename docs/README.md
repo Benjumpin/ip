@@ -2,7 +2,7 @@
 
 #### BenBot is a desktop task management application optimized for use via a Command Line Interface (CLI) while providing a clean, visual chat experience powered by JavaFX.
 
-![img.png](img.png)
+![Ui.png](Ui.png)
 
 ## Quick Start
 Ensure you have Java 17 or above installed.
